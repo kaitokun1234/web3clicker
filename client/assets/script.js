@@ -1,12 +1,11 @@
-let web3, user, bbsInst, posts;
-const bbsAddr = "0x94505D4e73393140BB672E914e6D2DbF0CC1177b";
+let web3, user, clickerInst, tokenInst;
+const clickerAddr = "0xf532Aa4d05950C0Eb412f08C7470907ff7967444";
+const tokenAddr = "0x0491d0EA5B40AaC0041038ec313AB97a6F0D322b";
 
 $(document).ready(async () => {
   if(window.ethereum){
     web3 = new Web3(Web3.givenProvider);
-    bbsInst = new web3.eth.Contract(abi.bbs, bbsAddr, {from: user});
-    posts = await bbsInst.methods.getPosts().call();
-    listPosts();
+    //posts = await bbsInst.methods.getPosts().call();
   }else{
     alert("メタマスクをインストールしてください");
   }
@@ -19,11 +18,13 @@ $(".btn.login").click(async () => {
       });
       user = accounts[0];
       $(".btn.login").html(user.slice(0,3)+"…"+user.slice(-3));
+      clickerInst = new web3.eth.Contract(abi.clicker, clickerAddr, {from: user});
+      tokenInst = new web3.eth.Contract(abi.token, tokenAddr, {from: user});
   } catch (error){
     alert(error.message);
   }
 })
-
+/*
 $(".btn.postBtn").click(async () => {
   var textval = $('#text').val();
   if(textval == "" || !user){
@@ -51,4 +52,4 @@ function listPosts(){
             +'<p class="card-text">'+posts[i][0]+'</p></div></div>';
    div.insertAdjacentHTML('beforeend', parts);
   }
-}
+}*/
