@@ -1,6 +1,9 @@
 let web3, user, clickerInst, tokenInst, money;
+
 const clickerAddr = "0xf532Aa4d05950C0Eb412f08C7470907ff7967444";
 const tokenAddr = "0x0491d0EA5B40AaC0041038ec313AB97a6F0D322b";
+
+var workerPrice = 10;
 
 $(document).ready(async () => {
   if(window.ethereum){
@@ -37,7 +40,32 @@ $(".btn.withdraw").click(async () =>{
 })
 
 async function withdraw(){
-  amount = web3.utils.toWei(String(money));
-  await clickerInst.methods.receiveReward(amount).send({from:user});
+  amount = towei(money);
+  try{
+    await clickerInst.methods.receiveReward(amount).send({from:user});
+  }catch(err){
+    throw(err);
+  }
 }
 
+$(".gacha").click(async() => {
+  try{
+    await tokenInst.methods.approve(dexAddr, workerPrice).send();
+  }catch(err){
+    throw(err);
+  }
+
+  try{
+    var gachaTx = await clickerInst.methods
+    .buyEmployee(towei(workerPrice))
+    .send({from:user});
+    console.log(gachaTx);
+  }catch (err){
+    throw(err);
+  }
+})
+
+function towei(raw){
+  var wei = web3.utils.toWei(String(raw));
+  return wei;
+}
