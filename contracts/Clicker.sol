@@ -3,7 +3,7 @@ pragma solidity >=0.4.22 <0.9.0;
 
 import "../node_modules/openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
-contract clicker {
+contract Clicker {
 
     struct employee{
         uint8 grade;
@@ -29,33 +29,35 @@ contract clicker {
     function buyEmployee(uint256 _cost) public payable{
         require(token.balanceOf(msg.sender) >= _cost, "Insufficient token balance");
         token.transferFrom(msg.sender, address(this), _cost);
-        employee _employee = generateEmployee();
+        employee memory _employee = generateEmployee();
         employees.push(_employee);
-        employeeToOwner[_dna] = msg.sender;
+        employeeToOwner[_employee.dna] = msg.sender;
         ownerEmployeeCount[msg.sender]++;
         emit BuyEmployee(_employee);
     }
 
-    function generateEmployee() private view returns(employee){
-        uint8 _grade = random("") % 3;
-        uint8 _speed = (random(string(_grade)) % 10)*_grade;
-        uint8 _stamina = (random(string(_speed)) % 10)*_grade;
-        uint _dna = random(string(_speed+_stamina+_grade));
-        employee _employee = employee(_grade, _speed, _stamina, _dna);
+    function generateEmployee() private view returns(employee memory){
+        uint8 _grade = uint8(random()) % 3;
+        uint8 _speed = uint8(random()) % 10;
+        _speed *= _grade;
+        uint8 _stamina = _speed;
+        uint _dna = random();
+        employee memory _employee = employee(_grade, _speed, _stamina, _dna);
         return _employee;
     }
 
     function receiveReward(uint _amount) public{
-        require(token.balanceOf(this) >= _amount);
+        require(token.balanceOf(address(this)) >= _amount);
         token.transfer(msg.sender, _amount); 
     }
 
-    function getAllEmployees() public view{
+    function getAllEmployees() public view returns(employee[] memory){
         return employees;
     } 
 
-    function random(string _str) private view returns (uint) {
-        uint rand = uint(keccak256(block.timestamp + _str));
+    function random() private view returns (uint) {
+        //uint rand = uint(keccak256(block.timestamp));
+        uint rand = uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty)));
         uint result = rand % randmodule;
         return result;
     }
