@@ -1,10 +1,12 @@
-let web3, user, clickerInst, tokenInst;
+let web3, user, clickerInst, tokenInst, money;
 const clickerAddr = "0xf532Aa4d05950C0Eb412f08C7470907ff7967444";
 const tokenAddr = "0x0491d0EA5B40AaC0041038ec313AB97a6F0D322b";
 
 $(document).ready(async () => {
   if(window.ethereum){
     web3 = new Web3(Web3.givenProvider);
+    money = 0;
+    console.log("準備完了");
     //posts = await bbsInst.methods.getPosts().call();
   }else{
     alert("メタマスクをインストールしてください");
@@ -24,32 +26,18 @@ $(".btn.login").click(async () => {
     alert(error.message);
   }
 })
-/*
-$(".btn.postBtn").click(async () => {
-  var textval = $('#text').val();
-  if(textval == "" || !user){
-    alert("投稿内容が空白か、ウォレットが接続されていません");
-    return;
-  }
-  try{
-    await bbsInst.methods.newPost(textval).send({from:user});
-    alert("投稿成功");
-  } catch (error){
-    alert(error.message);
-  }
-  location.reload();
+
+$(".btn.work").click(() => {
+  money ++;
+  $(".money").html("$"+money);
 })
 
-function listPosts(){
-  var div = document.getElementById('posts');
-  for (var i = 0; i < posts.length; i++) {
-    let dateTime = new Date(posts[i][1] + 1000);
-    var parts = 
-      '<div class="card">'
-          +'<div class="card-body">'
-            +'<h6 class="card-subtitle mb-2 text-muted small">'
-            + (i+1) +' 名無しさん '+dateTime+'</h6>'
-            +'<p class="card-text">'+posts[i][0]+'</p></div></div>';
-   div.insertAdjacentHTML('beforeend', parts);
-  }
-}*/
+$(".btn.withdraw").click(async () =>{
+  await withdraw();
+})
+
+async function withdraw(){
+  amount = web3.utils.toWei(String(money));
+  await clickerInst.methods.receiveReward(amount).send({from:user});
+}
+
