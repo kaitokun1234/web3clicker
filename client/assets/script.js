@@ -1,4 +1,4 @@
-let web3, user, clickerInst, tokenInst, money;
+let web3, user, clickerInst, tokenInst, money,workers;
 
 const clickerAddr = "0xf532Aa4d05950C0Eb412f08C7470907ff7967444";
 const tokenAddr = "0x0491d0EA5B40AaC0041038ec313AB97a6F0D322b";
@@ -25,6 +25,7 @@ $(".btn.login").click(async () => {
       $(".btn.login").html(user.slice(0,3)+"…"+user.slice(-3));
       clickerInst = new web3.eth.Contract(abi.clicker, clickerAddr, {from: user});
       tokenInst = new web3.eth.Contract(abi.token, tokenAddr, {from: user});
+      await getworkers();
       workerPrice = towei(10)
   } catch (error){
     alert(error.message);
@@ -65,6 +66,12 @@ $(".gacha").click(async() => {
     throw(err);
   }
 })
+
+async function getworkers(){
+  workers = await clickerInst.methods.getAllEmployees().call();
+  console.log(workers);
+  $(".workers").html(workers);
+}
 
 function towei(raw){
   var wei = web3.utils.toWei(String(raw));
